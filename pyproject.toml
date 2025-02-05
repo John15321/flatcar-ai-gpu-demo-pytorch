@@ -2,7 +2,7 @@
 name = "flatcar-ai-gpu-demo-pytorch"
 # Do not touch the version
 # Is is edited dynamically by the CI job
-version = "1.0.0"
+version = "1.1.0"
 description = "A demo project shocasing using Flatcar with PyTorch."
 authors = ["Jan Bronicki <janbronicki@microsoft.com>",]
 readme = "README.md"

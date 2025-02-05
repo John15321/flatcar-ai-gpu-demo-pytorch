@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/John15321/flatcar-ai-gpu-demo-pytorch/compare/v1.0.0...v1.1.0) (2025-02-05)
+
+
+### Features
+
+* Explicitly moce the image to be inferred ([8cb4abd](https://github.com/John15321/flatcar-ai-gpu-demo-pytorch/commit/8cb4abd9c63d7e3f52692830bcb4c6377e275e78))
+
 # 1.0.0 (2025-02-05)
 
 
