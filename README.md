@@ -1,6 +1,6 @@
 [![semantic-release](https://img.shields.io/badge/semantic--release-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
-# Flatcar AI GPU Demo PyTorch
+# Flatcar AI GPU Demo PyTorch (WORK IN PROGRESS)
 
 A demo project shocasing using Flatcar with PyTorch.
 
