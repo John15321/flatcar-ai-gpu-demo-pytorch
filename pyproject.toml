@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "flatcar-ai-gpu-demo-pytorch"
+# Do not touch the version
+# Is is edited dynamically by the CI job
+version = "0.0.0"
+description = "A demo project shocasing using Flatcar with PyTorch."
+authors = ["Jan Bronicki <janbronicki@microsoft.com>",]
+readme = "README.md"
+# homepage = ""
+# repository = ""
+
+
+[tool.poetry.scripts]
+fashion-mnist-train = "flatcar_ai_gpu_demo_pytorch:main_train"
+fashion-mnist-predict = "flatcar_ai_gpu_demo_pytorch:main_predict"
+download-mnist-samples="flatcar_ai_gpu_demo_pytorch:main_download_fashion_mnist_samples"
+
+[tool.poetry.dependencies]
+python = ">=3.10, <=3.12"
+torch = "^2.6.0"
+torchvision = "^0.21.0"
+matplotlib = "^3.10.0"
+tensorboard = "^2.18.0"
+pillow = "^11.1.0"
+
+
+[tool.poetry.group.format.dependencies]
+black = "^25.1.0"
+isort = "^6.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+tox = "^4.24.1"
+
+
+[tool.poetry.group.type_check.dependencies]
+mypy = "^1.15.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.4"
+pytest-mock = "^3.14.0"
+pytest-cov = "^6.0.0"
+toml = "^0.10.2"
+
+
+[tool.poetry.group.lint.dependencies]
+pylint = "^3.3.4"
+pytest = "^8.3.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
