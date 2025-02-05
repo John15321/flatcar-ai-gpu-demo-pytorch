@@ -50,7 +50,10 @@ class SimpleNN(nn.Module):
 
 
 def predict(image_path, model_path):
-    """Predict the class of a given image using a trained model."""
+    """
+    Predict the class of a given image using a trained model,
+    ensuring GPU inference if available.
+    """
     transform = transforms.Compose(
         [
             transforms.Grayscale(),
@@ -59,15 +62,24 @@ def predict(image_path, model_path):
         ]
     )
     image = Image.open(image_path).convert("L")
-    image = transform(image).unsqueeze(0)
+    image = transform(image).unsqueeze(0)  # Add batch dimension
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    print(f"Using device for inference: {device}")
+    if device.type == "cuda":
+        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
+
+    # Load model and move to appropriate device
     model = SimpleNN().to(device)
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
+    # Move input image to the device
+    image = image.to(device)
+
     with torch.no_grad():
-        output = model(image.to(device))
+        output = model(image)
         _, predicted = torch.max(output, 1)
 
     predicted_class = predicted.item()
