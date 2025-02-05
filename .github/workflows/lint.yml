@@ -7,7 +7,7 @@ jobs:
     lint:
         strategy:
             matrix:
-                python-version: ["3.11"] # Should be the newest version supported
+                python-version: ["3.12"] # Should be the newest version supported
         name: 🖋 Check linting
         runs-on: ubuntu-latest
         steps:
