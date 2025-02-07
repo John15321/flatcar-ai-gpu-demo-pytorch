@@ -49,6 +49,23 @@ class SimpleNN(nn.Module):
         return x
 
 
+def get_device_info():
+    """Get device information for GPU inference."""
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device for inference: {device}")
+    if device.type == "cuda":
+        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
+    return device
+
+
+def load_model(model_path, device):
+    """Load the model and move it to the appropriate device."""
+    model = SimpleNN().to(device)
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.eval()
+    return model
+
+
 def predict(image_path, model_path):
     """
     Predict the class of a given image using a trained model,
@@ -64,16 +81,8 @@ def predict(image_path, model_path):
     image = Image.open(image_path).convert("L")
     image = transform(image).unsqueeze(0)  # Add batch dimension
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    print(f"Using device for inference: {device}")
-    if device.type == "cuda":
-        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
-
-    # Load model and move to appropriate device
-    model = SimpleNN().to(device)
-    model.load_state_dict(torch.load(model_path, map_location=device))
-    model.eval()
+    device = get_device_info()
+    model = load_model(model_path, device)
 
     # Move input image to the device
     image = image.to(device)
