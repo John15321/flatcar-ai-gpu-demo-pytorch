@@ -98,9 +98,12 @@ def predict(image_path, model_path):
 def train_and_evaluate(  # pylint: disable=too-many-locals
     batch_size=64,
     learning_rate=0.001,
-    epochs=5,
+    epochs=10,
     log_dir="runs/fashion_mnist",
     model_path="fashion_mnist.pth",
+    weight_decay=1e-4,
+    lr_scheduler_step_size=5,
+    lr_scheduler_gamma=0.1,
 ):
     """
     Train and evaluate a neural network on the Fashion-MNIST dataset.
@@ -111,6 +114,9 @@ def train_and_evaluate(  # pylint: disable=too-many-locals
         epochs (int): Number of training epochs.
         log_dir (str): Directory for TensorBoard logs.
         model_path (str): Path to save the trained model.
+        weight_decay (float): Weight decay for regularization.
+        lr_scheduler_step_size (int): Step size for learning rate scheduler.
+        lr_scheduler_gamma (float): Gamma for learning rate scheduler.
     """
     print("Initializing training...")
     print(f"Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {epochs}")
@@ -141,7 +147,10 @@ def train_and_evaluate(  # pylint: disable=too-many-locals
 
     model = SimpleNN().to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+
+    # Learning rate scheduler
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=lr_scheduler_step_size, gamma=lr_scheduler_gamma)
 
     writer = SummaryWriter(log_dir)
 
@@ -164,6 +173,9 @@ def train_and_evaluate(  # pylint: disable=too-many-locals
                 )
                 print(f"Epoch {epoch+1}, Batch {i+1}, Loss: {running_loss / 100:.4f}")
                 running_loss = 0.0
+
+        # Step the learning rate scheduler
+        scheduler.step()
 
         correct = 0
         total = 0
