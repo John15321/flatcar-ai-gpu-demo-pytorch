@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/John15321/flatcar-ai-gpu-demo-pytorch/compare/v1.1.0...v1.2.0) (2025-02-07)
+
+
+### Features
+
+* **NONE:** Add a chatbot using a pre-trained LLM ([#1](https://github.com/John15321/flatcar-ai-gpu-demo-pytorch/issues/1)) ([04dadad](https://github.com/John15321/flatcar-ai-gpu-demo-pytorch/commit/04dadad0073c3348e793f1eb8df1a183a9a0edb7))
+
 # [1.1.0](https://github.com/John15321/flatcar-ai-gpu-demo-pytorch/compare/v1.0.0...v1.1.0) (2025-02-05)
 
 
