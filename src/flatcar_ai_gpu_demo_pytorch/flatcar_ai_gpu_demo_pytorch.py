@@ -49,6 +49,46 @@ class SimpleNN(nn.Module):
         return x
 
 
+def get_device_info():
+    """Get detailed device information for inference."""
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device for inference: {device}")
+
+    if device.type == "cuda":
+        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
+        print(f"CUDA Capability: {torch.cuda.get_device_capability(0)}")
+        print(
+            f"Total Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB"
+        )
+        print(
+            f"Multiprocessors: {torch.cuda.get_device_properties(0).multi_processor_count}"
+        )
+        print(
+            "Memory Clock Rate: "
+            f"{torch.cuda.get_device_properties(0).memory_clock_rate / 1e3:.2f} MHz"
+        )
+        print(
+            f"CUDA Cores: {torch.cuda.get_device_properties(0).multi_processor_count * 64}"
+        )
+    else:
+        print("CPU Information:")
+        print(
+            "Processor: "
+            f"{torch.backends.cpu.get_cpu_name() if hasattr(torch.backends.cpu, 'get_cpu_name') else 'Unknown'}"  # pylint: disable=line-too-long
+        )
+        print(f"Number of Cores: {torch.get_num_threads()}")
+
+    return device
+
+
+def load_model(model_path, device):
+    """Load the model and move it to the appropriate device."""
+    model = SimpleNN().to(device)
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.eval()
+    return model
+
+
 def predict(image_path, model_path):
     """
     Predict the class of a given image using a trained model,
@@ -64,16 +104,8 @@ def predict(image_path, model_path):
     image = Image.open(image_path).convert("L")
     image = transform(image).unsqueeze(0)  # Add batch dimension
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    print(f"Using device for inference: {device}")
-    if device.type == "cuda":
-        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
-
-    # Load model and move to appropriate device
-    model = SimpleNN().to(device)
-    model.load_state_dict(torch.load(model_path, map_location=device))
-    model.eval()
+    device = get_device_info()
+    model = load_model(model_path, device)
 
     # Move input image to the device
     image = image.to(device)
@@ -86,12 +118,15 @@ def predict(image_path, model_path):
     print(f"Predicted class: {predicted_class} ({class_labels[predicted_class]})")
 
 
-def train_and_evaluate(  # pylint: disable=too-many-locals
+def train_and_evaluate(  # pylint: disable=too-many-locals,too-many-statements,too-many-positional-arguments,too-many-arguments
     batch_size=64,
     learning_rate=0.001,
-    epochs=5,
+    epochs=10,
     log_dir="runs/fashion_mnist",
     model_path="fashion_mnist.pth",
+    weight_decay=1e-4,
+    lr_scheduler_step_size=5,
+    lr_scheduler_gamma=0.1,
 ):
     """
     Train and evaluate a neural network on the Fashion-MNIST dataset.
@@ -102,6 +137,9 @@ def train_and_evaluate(  # pylint: disable=too-many-locals
         epochs (int): Number of training epochs.
         log_dir (str): Directory for TensorBoard logs.
         model_path (str): Path to save the trained model.
+        weight_decay (float): Weight decay for regularization.
+        lr_scheduler_step_size (int): Step size for learning rate scheduler.
+        lr_scheduler_gamma (float): Gamma for learning rate scheduler.
     """
     print("Initializing training...")
     print(f"Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {epochs}")
@@ -121,18 +159,18 @@ def train_and_evaluate(  # pylint: disable=too-many-locals
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
-    if device.type == "cuda":
-        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
-        print(
-            f"GPU Memory Allocated: {torch.cuda.memory_allocated(0) / 1024**2:.2f} MB"
-        )
-        print(f"GPU Memory Cached: {torch.cuda.memory_reserved(0) / 1024**2:.2f} MB")
+    device = get_device_info()
 
     model = SimpleNN().to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = optim.Adam(
+        model.parameters(), lr=learning_rate, weight_decay=weight_decay
+    )
+
+    # Learning rate scheduler
+    scheduler = optim.lr_scheduler.StepLR(
+        optimizer, step_size=lr_scheduler_step_size, gamma=lr_scheduler_gamma
+    )
 
     writer = SummaryWriter(log_dir)
 
@@ -155,6 +193,9 @@ def train_and_evaluate(  # pylint: disable=too-many-locals
                 )
                 print(f"Epoch {epoch+1}, Batch {i+1}, Loss: {running_loss / 100:.4f}")
                 running_loss = 0.0
+
+        # Step the learning rate scheduler
+        scheduler.step()
 
         correct = 0
         total = 0

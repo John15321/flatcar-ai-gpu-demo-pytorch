@@ -14,6 +14,7 @@ readme = "README.md"
 fashion-mnist-train = "flatcar_ai_gpu_demo_pytorch:main_train"
 fashion-mnist-predict = "flatcar_ai_gpu_demo_pytorch:main_predict"
 download-mnist-samples="flatcar_ai_gpu_demo_pytorch:main_download_fashion_mnist_samples"
+chatbot-cli="flatcar_ai_gpu_demo_pytorch:chatbot_cli"
 
 [tool.poetry.dependencies]
 python = ">=3.10, <=3.12"
@@ -22,6 +23,7 @@ torchvision = "^0.21.0"
 matplotlib = "^3.10.0"
 tensorboard = "^2.18.0"
 pillow = "^11.1.0"
+transformers = "^4.48.2"
 
 
 [tool.poetry.group.format.dependencies]

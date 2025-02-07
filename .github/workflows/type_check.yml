@@ -8,7 +8,7 @@ jobs:
         strategy:
             matrix:
                 os: [ubuntu-latest]
-                python-version: ["3.12"] # Should be the lowest supported version
+                python-version: ["3.10"] # Should be the lowest supported version
         name: 🦺 Run Static Type Checking
         runs-on: ${{ matrix.os }}
         steps:
