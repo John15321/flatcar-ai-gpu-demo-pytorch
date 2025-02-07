@@ -12,3 +12,4 @@ from .flatcar_ai_gpu_demo_pytorch import (
     main_predict,
     main_train,
 )
+from .llm import chatbot_cli

@@ -50,11 +50,34 @@ class SimpleNN(nn.Module):
 
 
 def get_device_info():
-    """Get device information for GPU inference."""
+    """Get detailed device information for inference."""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device for inference: {device}")
+
     if device.type == "cuda":
         print(f"GPU Name: {torch.cuda.get_device_name(0)}")
+        print(f"CUDA Capability: {torch.cuda.get_device_capability(0)}")
+        print(
+            f"Total Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB"
+        )
+        print(
+            f"Multiprocessors: {torch.cuda.get_device_properties(0).multi_processor_count}"
+        )
+        print(
+            "Memory Clock Rate: "
+            f"{torch.cuda.get_device_properties(0).memory_clock_rate / 1e3:.2f} MHz"
+        )
+        print(
+            f"CUDA Cores: {torch.cuda.get_device_properties(0).multi_processor_count * 64}"
+        )
+    else:
+        print("CPU Information:")
+        print(
+            "Processor: "
+            f"{torch.backends.cpu.get_cpu_name() if hasattr(torch.backends.cpu, 'get_cpu_name') else 'Unknown'}"  # pylint: disable=line-too-long
+        )
+        print(f"Number of Cores: {torch.get_num_threads()}")
+
     return device
 
 
@@ -95,7 +118,7 @@ def predict(image_path, model_path):
     print(f"Predicted class: {predicted_class} ({class_labels[predicted_class]})")
 
 
-def train_and_evaluate(  # pylint: disable=too-many-locals
+def train_and_evaluate(  # pylint: disable=too-many-locals,too-many-statements,too-many-positional-arguments,too-many-arguments
     batch_size=64,
     learning_rate=0.001,
     epochs=10,
@@ -136,21 +159,18 @@ def train_and_evaluate(  # pylint: disable=too-many-locals
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
-    if device.type == "cuda":
-        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
-        print(
-            f"GPU Memory Allocated: {torch.cuda.memory_allocated(0) / 1024**2:.2f} MB"
-        )
-        print(f"GPU Memory Cached: {torch.cuda.memory_reserved(0) / 1024**2:.2f} MB")
+    device = get_device_info()
 
     model = SimpleNN().to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+    optimizer = optim.Adam(
+        model.parameters(), lr=learning_rate, weight_decay=weight_decay
+    )
 
     # Learning rate scheduler
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=lr_scheduler_step_size, gamma=lr_scheduler_gamma)
+    scheduler = optim.lr_scheduler.StepLR(
+        optimizer, step_size=lr_scheduler_step_size, gamma=lr_scheduler_gamma
+    )
 
     writer = SummaryWriter(log_dir)
 

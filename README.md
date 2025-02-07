@@ -24,11 +24,13 @@ cd flatcar-ai-gpu-demo-pytorch
 poetry install
 ```
 
+# The MNIST Fashion example
+
 ## Training the Model
 To train a new model on the Fashion-MNIST dataset, run the following command:
 
 ```bash
-poetry run fashion-mnist-train --batch-size 64 --learning-rate 0.001 --epochs 5 --log-dir runs/fashion_mnist --model-path fashion_mnist.pth
+fashion-mnist-train --batch-size 64 --learning-rate 0.001 --epochs 5 --log-dir runs/fashion_mnist --model-path fashion_mnist.pth
 ```
 
 This will:
@@ -49,7 +51,7 @@ Open [http://localhost:6006](http://localhost:6006) in a browser to see the logs
 To predict the class of an image, use:
 
 ```bash
-poetry run fashion-mnist-predict fashion_mnist_samples/bag.png --model-path fashion_mnist.pth
+fashion-mnist-predict fashion_mnist_samples/bag.png --model-path fashion_mnist.pth
 ```
 
 This will output something like:
@@ -62,17 +64,53 @@ Predicted class: 8 (Bag)
 To download and extract a batch of Fashion-MNIST sample images, run:
 
 ```bash
-poetry run download-mnist-samples --num-samples 10 --output-dir fashion_mnist_samples
+download-mnist-samples --num-samples 10 --output-dir fashion_mnist_samples
 ```
 
 This will create a `fashion_mnist_samples/` directory containing a variety of example images from the dataset.
 
+---
+
+# CLI chatbot feature
+
+## **Using the CLI Chatbot**
+
+The `flatcar_ai_gpu_demo_pytorch` package includes a **command-line chatbot** powered by a locally hosted **GPT-2 model**. This chatbot allows you to have interactive conversations directly from your terminal.
+
+### **Running the Chatbot**
+To start the chatbot, after installing the package simply run the following command:
+
+```bash
+chatbot-cli
+```
+
+
+### **How It Works**
+- The chatbot uses the **GPT-2 language model**, running locally on your machine.
+- If a **GPU (CUDA)** is available, it will automatically use it for faster responses.
+- The chatbot supports **top-k and top-p sampling**, making its responses more diverse and natural.
+
+### **Example Usage**
+```bash
+$ chatbot-cli
+You: Hello!
+Chatbot: Hello! How can I assist you today?
+You: What's your name?
+Chatbot: I'm a language model running locally on your machine.
+You: exit
+Chatbot: Goodbye!
+```
+
+### **Additional Notes**
+- The chatbot **does not require internet access** once the model is downloaded.
+- To **improve response time**, use a GPU if available.
+
+---
 
 # Development
 
 ## Tools and local environment
 
----
 
 This is a short description of how to work with this project. First create your virtual environment and activate it:
 
